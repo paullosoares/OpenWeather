@@ -32,6 +32,7 @@ namespace Weather.Infra.Services
         public async Task<OpenWeatherDto> GetTemperatureByCityName(string cityName)
         {
             var response = await _httpClient.GetAsync($"data/2.5/weather?q={cityName}&appid={_appSettings.WeatherAppId}&lang=pt_br");
+
             if (!TryResponseError(response))
                 return null;
 
@@ -46,9 +47,10 @@ namespace Weather.Infra.Services
         public async Task<OpenWeatherDto> GetTemperatureByLatLon(double latitude, double longitude)
         {
             var response = await _httpClient.GetAsync($"data/2.5/weather?lat={latitude}&lon={longitude}&appid={_appSettings.WeatherAppId}&lang=pt_br");
+
             if (!TryResponseError(response))
                 return null;
-            
+
             var openWeatherDto = await DeserializeResponseObject<OpenWeatherDto>(response);
 
             if (openWeatherDto != null)
@@ -56,7 +58,7 @@ namespace Weather.Infra.Services
 
             return openWeatherDto;
         }
-         
+
         public async Task PersistOpenWeather(OpenWeatherDto openWeatherDto)
         {
             await _weatherRepository.AddAsync(ConvertOpenWeatherDtoInOpenWeather(openWeatherDto));

@@ -1,9 +1,8 @@
-﻿using Microsoft.Extensions.Options;
+﻿using MediatR;
+using Microsoft.Extensions.Options;
 using Moq;
-using Moq.AutoMock;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Weather.Core.Exceptions;
 using Weather.Core.Extensions;
 using Weather.Core.Notifications;
 using Weather.Domain.Repositories;
@@ -17,7 +16,8 @@ namespace Weather.Tests.Integration.Services
         private readonly IOptions<OpenWeatherSettings> _options;
         private readonly IMediatorHandler _mediatorHandler;
         private readonly IWeatherRepository _weatherRepository;
-        
+        private readonly NotificationHandler _notifications;
+
         public WeatherServiceTests()
         {
             CreateScope();
@@ -28,6 +28,7 @@ namespace Weather.Tests.Integration.Services
             });
             _weatherRepository = GetInstance<IWeatherRepository>();
             _mediatorHandler = GetInstance<IMediatorHandler>();
+            _notifications = (NotificationHandler)GetInstance<INotificationHandler<Notification>>();
 
         }
 
@@ -50,7 +51,7 @@ namespace Weather.Tests.Integration.Services
         }
 
         [Fact]
-        public async Task WeatherService_WhenGetByInValidCityName_MustBeReturnCustomException()
+        public async Task WeatherService_WhenGetByInValidCityName_MustBeReturnNotification()
         {
             //Arrange
             var httpClient = new Mock<HttpClient>();
@@ -59,8 +60,13 @@ namespace Weather.Tests.Integration.Services
                 _weatherRepository,
                 _mediatorHandler);
 
+            //Act
+            var response = await service.GetTemperatureByCityName(cityName: "InvalidCityName");
+
             //Act, Assert
-            await Assert.ThrowsAsync<CustomHttpRequestException>(async () => await service.GetTemperatureByCityName(cityName: "InvalidCityName"));
+              Assert.Null(response);
+              Assert.True(_notifications.HasNotifications());
+              Assert.Single(_notifications.GetNotifications());
         }
 
         [Fact]

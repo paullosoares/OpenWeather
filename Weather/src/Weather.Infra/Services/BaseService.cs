@@ -32,19 +32,13 @@ namespace Weather.Infra.Services
 
         protected bool TryResponseError(HttpResponseMessage response)
         {
-            switch ((int)response.StatusCode)
+            if (!response.IsSuccessStatusCode)
             {
-                case 401:
-                case 403:
-                case 404:
-                case 500:
-                throw new CustomHttpRequestException(response.StatusCode);
-                case 400:
-                    return false;
+                var errorContent = response.Content.ReadAsStringAsync().Result;
+                AddNotificationError(string.Empty, errorContent);
             }
 
-            response.EnsureSuccessStatusCode();
-            return true;
+            return response.IsSuccessStatusCode;
         }
     }
 }

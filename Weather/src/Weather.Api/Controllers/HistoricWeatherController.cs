@@ -10,15 +10,15 @@ namespace Weather.Api.Controllers
     public class HistoricWeatherController : MainController
     {
         private readonly IHistoricWeatherService _historicWeatherService;
-        public HistoricWeatherController(INotificationHandler<Notification> notifications, 
-                                            IMediatorHandler mediatorHandler, 
+        public HistoricWeatherController(INotificationHandler<Notification> notifications,
+                                            IMediatorHandler mediatorHandler,
                                             IHistoricWeatherService historicWeatherService) : base(notifications, mediatorHandler)
         {
             _historicWeatherService = historicWeatherService;
         }
 
-        [HttpGet("{latitude}/{longitude}")]
-        public async Task<IActionResult> GetHistoricByLatLon(double latitude, double longitude)
+        [HttpGet]
+        public async Task<IActionResult> Get([FromQuery] double latitude, [FromQuery] double longitude)
         {
             if (latitude == 0 || longitude == 0)
             {
