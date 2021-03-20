@@ -1,5 +1,3 @@
-# Desafio C# Easy Level - ConexaLabs 2020
-
 ## Rodando o Projeto
 
 * Executar o comando [ Update-Database ] no visual studio
